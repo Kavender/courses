@@ -19,3 +19,6 @@ def majority_vote(labels):
         return winner
     # when there is a tie, try again without the farthest
     return majority_vote(labels[:-1])
+
+
+# ANN is much faster implementation of KNN
