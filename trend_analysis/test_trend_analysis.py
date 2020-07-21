@@ -11,6 +11,7 @@ from visualize_trend import display_trend_with_breakpoints
 from trend_utils import pairwise
 from trend_analysis import identify_trend_and_breakpoints, analyze_trend_segment
 import trend_correlation
+from fbprophet import Prophet
 
 
 if __name__ == "__main__":
@@ -19,6 +20,31 @@ if __name__ == "__main__":
     data.set_index('Date', inplace=True)
     print("ts_data:", data.shape, data.columns)
     ts = data["gm_cap"] #"#Passengers"
+
+    data = pd.read_csv(data_folder+"/cars_with_segments.csv")
+    test_data = data[['Date', 'gm_cap']]
+    test_data.columns = ['ds', 'y']
+    print("test_Data", test_data.shape, test_data.tail(3))
+
+    m = Prophet()
+    m.fit(test_data)
+    future = m.make_future_dataframe(periods=365)
+    print(future.tail())
+    forecast = m.predict(future)
+    print(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail())
+    fig1 = m.plot(forecast)
+    plt.show(block=False)
+    fig2 = m.plot_components(forecast)
+    plt.show(block=False)
+
+    from fbprophet.plot import add_changepoints_to_plot
+    # m = Prophet(changepoint_range=0.6)
+    # future = m.make_future_dataframe(periods=365)
+    # forecast = m.predict(future)
+    fig = m.plot(forecast)
+    a = add_changepoints_to_plot(fig.gca(), m, forecast)
+    plt.show(block=True)
+    exit()
 
     # ts_tesla = data["tesla_cap"]
     # ts_gm = data["gm_cap"]
